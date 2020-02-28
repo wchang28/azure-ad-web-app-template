@@ -1,0 +1,51 @@
+{
+  "name": "azure-ad-web-app-template",
+  "version": "1.0.0",
+  "description": "Azure AD Web App Template",
+  "scripts": {
+    "transpile": "tsc",
+    "browserify": "browserify ./dist/ui/main.js -o ./dist/ui/bundle.js",
+    "uglify": "uglifyjs ./dist/ui/bundle.js -o ./public/js/bundle.min.js --compress --mangle",
+    "package-ui": "npm run browserify && npm run uglify",
+    "postinstall": "npm run transpile && npm run package-ui",
+    "start": "node ./dist/server/app.js",
+    "start-tar": "node ./dist/tokens-auto-refresher/app.js"
+  },
+  "author": "Wen Chang",
+  "license": "MIT",
+  "dependencies": {
+    "@types/body-parser": "^1.17.1",
+    "@types/connect-pg-simple": "^4.2.0",
+    "@types/express": "^4.17.2",
+    "@types/express-session": "^1.15.16",
+    "@types/mssql": "^6.0.0",
+    "@types/node": "^13.7.0",
+    "@types/passport": "^1.0.2",
+    "@types/passport-azure-ad": "^4.0.3",
+    "@types/pg": "^7.14.1",
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "@types/superagent": "^4.1.5",
+    "body-parser": "^1.19.0",
+    "connect-mssql": "^1.5.0",
+    "connect-pg-simple": "^6.1.0",
+    "express": "^4.17.1",
+    "express-http-proxy-middleware": "git+https://github.com/wchang28/express-http-proxy-middleware.git",
+    "express-session": "^1.17.0",
+    "msnodesqlv8": "^0.8.6",
+    "mssql": "^6.0.1",
+    "passport": "^0.4.1",
+    "passport-azure-ad": "^4.2.1",
+    "periodic-polling": "git+https://github.com/wchang28/periodic-polling.git",
+    "pg": "^7.18.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "rest-api-client": "git+https://github.com/wchang28/rest-api-client.git",
+    "superagent": "^5.2.1",
+    "typescript": "^3.7.5"
+  },
+  "devDependencies": {
+    "browserify": "^16.5.0",
+    "uglify-js": "^3.7.7"
+  }
+}

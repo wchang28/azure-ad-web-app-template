@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Azure AD Template Web App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script>
+        const setUser = (u) => {window.user = u;};
+    </script>
+    <script src="me?callback=setUser"></script>
+    <script>console.log(`window.user=${JSON.stringify(window.user, null, 2)}`)</script>
+</head>
+<body>
+    <div id="main"></div>
+    <script src="js/bundle.min.js"></script>
+</body>
+</html> 

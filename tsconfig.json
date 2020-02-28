@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "jsx": "react",
+        "sourceMap": true,
+        "declaration": true,
+        "outDir": "./dist",
+        "watch": false,
+        "lib": [
+          "es2017",
+          "dom",
+          "dom.iterable"
+        ]
+    },
+    "files": [
+        "./src/server/app.ts",
+        "./src/ui/main.tsx",
+        "./src/tokens-auto-refresher/app.ts",
+    ]
+}

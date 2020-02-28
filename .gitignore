@@ -1,0 +1,12 @@
+/node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+/dist/
+
+/.vscode/
+
+/public/js/bundle.min.js
