@@ -325,5 +325,5 @@ const hostname = process.env.HOSTNAME || "127.0.0.1";
 
 // start the app service
 server.listen(port, hostname, () => {
-    console.log(`[${new Date().toISOString()}]: app server listening on port ${hostname}:${port} :-)`);
+    console.log(`[${new Date().toISOString()}]: app server listening on ${ssl ? "https://" : "http://"}${hostname}:${port} :-)`);
 });
