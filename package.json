@@ -13,6 +13,10 @@
   },
   "author": "Wen Chang",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wchang28/azure-ad-web-app-template.git"
+  },
   "dependencies": {
     "@types/body-parser": "^1.17.1",
     "@types/connect-pg-simple": "^4.2.0",
