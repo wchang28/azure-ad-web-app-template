@@ -22,7 +22,7 @@ export class SessionDB {
     }
     async getTokenAboutToExpireRenewableSessions() {
         const req = await this.reqReady();
-        const result = await req.query("SELECT [sid], [session] FROM [dbo].[sessions] (NOLOCK) WHERE [session_expired]=0 AND [refresh_token] IS NOT NULL AND [token_expire_in_minute] < 10");
+        const result = await req.query("SELECT [sid], [session] FROM [dbo].[sessions] (NOLOCK) WHERE [session_expired]=0 AND [refresh_token] IS NOT NULL AND [token_expire_in_minute] <= 10");
         return (result.recordset as {sid: string, session: string}[]).map(({sid, session}) => {
             return {sid, sessionStore: JSON.parse(session) as SessionStore};
         });
