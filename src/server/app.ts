@@ -157,7 +157,7 @@ passport.use(new OIDCStrategy({
         ,token_type: params.token_type
         ,access_token: access_token
         ,refresh_token: refresh_token
-        ,token_expire_time: tokenExpireTime.getTime()
+        ,token_expire_utc: tokenExpireTime.toISOString()
     };
     console.log(`${new Date().toISOString()}: access token <<ACQUIRED>> for user ${JSON.stringify(user)}, expiration=${tokenExpireTime.toISOString()}`);
     done(null, sessionStore);

@@ -60,13 +60,13 @@ const db = new SessionDB(sessionStoreMSSqlConfig);
 
 async function run() {
     console.log(`${new Date().toISOString()}: checking...`);
-    const aboutToExpireSessions = await db.getAboutToExpireSessions();
-    if (aboutToExpireSessions.length > 0) {
-        console.log(`${new Date().toISOString()}: ${aboutToExpireSessions.length} session need(s) to refresh their tokens`);
+    const tokenAboutToExpireSessions = await db.getTokenAboutToExpireRenewableSessions();
+    if (tokenAboutToExpireSessions.length > 0) {
+        console.log(`${new Date().toISOString()}: ${tokenAboutToExpireSessions.length} session need(s) to refresh their tokens`);
     } else {
         console.log(`${new Date().toISOString()}: no session need to refresh their tokens`);
     }
-    const ps = aboutToExpireSessions.map(async ({sid, sessionStore}) => {
+    const ps = tokenAboutToExpireSessions.map(async ({sid, sessionStore}) => {
         try {
             const userStore = sessionStore.passport.user;
             const {token_type, access_token, refresh_token, expires_in} = await tokenRefresher.refresh(userStore.refresh_token);
@@ -74,7 +74,7 @@ async function run() {
             userStore.token_type = token_type;
             userStore.access_token = access_token;
             userStore.refresh_token = refresh_token;
-            userStore.token_expire_time = tokenExpireTime.getTime();
+            userStore.token_expire_utc = tokenExpireTime.toISOString();
             //console.log(`sid=${sid},userStore=\n${JSON.stringify(userStore)}`);
             await db.saveSession(sid, sessionStore);
             return {sid, err: null};
@@ -89,7 +89,7 @@ async function run() {
             badSids.push(item);
         }
     });
-    if (aboutToExpireSessions.length > 0) {
+    if (tokenAboutToExpireSessions.length > 0) {
         if (badSids.length > 0) {
             console.log(`${new Date().toISOString()}: ${badSids.length} session(s) is/are unable to refresh token. badSids=\n${JSON.stringify(badSids, null, 2)}`);
         } else {
@@ -97,7 +97,7 @@ async function run() {
         }
     }
     console.log(`${new Date().toISOString()}: deleting any expired sessions...`);
-    await db.deleteTokenExpiredSessions();
+    await db.deleteExpiredSessions();
     console.log(`${new Date().toISOString()}: done\n`);
 }
 

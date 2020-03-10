@@ -19,7 +19,7 @@ export interface UserSessionStore {
     token_type: string;
     access_token: string;
     refresh_token: string;
-    token_expire_time: number;
+    token_expire_utc: string;
 }
 
 export interface SessionStore {

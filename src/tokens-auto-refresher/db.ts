@@ -20,9 +20,9 @@ export class SessionDB {
         const pool = await this.connected;
         return pool.request();
     }
-    async getAboutToExpireSessions() {
+    async getTokenAboutToExpireRenewableSessions() {
         const req = await this.reqReady();
-        const result = await req.query("SELECT [sid], [session] FROM [dbo].[sessions] (NOLOCK) WHERE DATEDIFF(minute, GETUTCDATE(), [token_expire_utc]) < 10");
+        const result = await req.query("SELECT [sid], [session] FROM [dbo].[sessions] (NOLOCK) WHERE [session_expired]=0 AND [refresh_token] IS NOT NULL AND [token_expire_in_minute] < 10");
         return (result.recordset as {sid: string, session: string}[]).map(({sid, session}) => {
             return {sid, sessionStore: JSON.parse(session) as SessionStore};
         });
@@ -34,13 +34,9 @@ export class SessionDB {
         .input("session", JSON.stringify(sessionStore))
         .query("UPDATE [dbo].[sessions] SET [session]=@session WHERE [sid]=@sid");
     }
-    async deleteTokenExpiredSessions() {
+    async deleteExpiredSessions() {
         const req = await this.reqReady();
-        await req.query("DELETE FROM [dbo].[sessions] WHERE GETUTCDATE()>[token_expire_utc]");
-    }
-    async deleteAllSessions() {
-        const req = await this.reqReady();
-        await req.query("TRUNCATE TABLE [dbo].[sessions]");       
+        await req.query("DELETE FROM [dbo].[sessions] WHERE [session_expired]=1");
     }
     async close() {
         const pool = await this.connected;
