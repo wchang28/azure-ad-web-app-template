@@ -187,6 +187,7 @@ app.use(passport.session());
 app.get("/login"
 ,(req, res, next) => {
     const state = req.query["state"] as string;
+    console.log(`${new Date().toISOString()}: in /login, state=${state ? state : "(none)"}`);
     const options: any = {
         customState: state ? state : undefined
         ,failureRedirect: '/'
@@ -202,12 +203,21 @@ app.get("/login"
 app.post('/auth/openid/return'
 ,bodyParser.urlencoded({ extended : true })
 ,(req, res, next) => {
+    console.log(`${new Date().toISOString()}: We received a return from AzureAD.\n<<post_body>>=\n${JSON.stringify(req.body, null, 2)}`);
+    next();
+}
+,(req, res, next) => {
     passport.authenticate('azuread-openidconnect', {failureRedirect: '/'})(req, res, next);   
 }
 ,(req, res) => {
-    //console.log(`${new Date().toISOString()}: We received a return from AzureAD.\n<<post_body>>=\n${JSON.stringify(req.body, null, 2)}`);
     const {state} = (req.body as {state?: string, code?: string, session_state?: string});
-    res.redirect(state && state.charAt(0) === "/" ? state : '/');
+    let stateObj: {path?: string} = null;
+    if (state) {
+        try {
+            stateObj = JSON.parse(state);
+        } catch(e) {}
+    }
+    res.redirect(stateObj && stateObj.path ? stateObj.path : "/");
 });
 
 // 'logout' route, logout from passport, and destroy the session with AAD.
@@ -279,20 +289,15 @@ app.get("/debug-session", (req, res) => {
     });
 });
 
-// traffic: from browser navigation
-app.use("/protected-resource",
+// CATCH_ALL route
+app.use(
 (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        // redirect user to sign in first
-        res.redirect(`/login?state=${encodeURIComponent(`/protected-resource${req.url}`)}`);
-    }
-});
-
-// traffic: from browser navigation
-app.get("/protected-resource/me", (req, res) => {
-    res.json(req.user);
+    const authenticated = req.isAuthenticated();
+    const stateObjJSON = JSON.stringify({path: req.url});
+    const redirectUrl = `/${authenticated ? "#" : "login?"}state=${encodeURIComponent(stateObjJSON)}`;
+    console.log("");
+    console.log(`${new Date().toISOString()}: <<CATCH_ALL>>: ${authenticated ? "" : "NOT "}Authentictated. redirecting to ${redirectUrl}`);
+    res.redirect(redirectUrl);
 });
 
 // setup the http server
