@@ -1,3 +1,9 @@
+export interface AppInfo {
+    name: string;
+    version: string;
+    description: string;
+}
+
 export interface ADTokenResponse {
     token_type?: string;
     scope?: string;  // space seperated

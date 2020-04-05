@@ -30,6 +30,7 @@ const MSSQLStore = require('connect-mssql')(expressSession);
 import * as sql from "mssql";
 import * as api from "rest-api-client";
 import {Session as APISession} from "../shared/api-session";
+const packageJSON = require("../../package.json") as types.AppInfo;
 
 // application/client settings
 /////////////////////////////////////////////////////////////////////
@@ -183,7 +184,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // login
-// traffic: from browser navigation
+// traffic source: browser navigation
 app.get("/login"
 ,(req, res, next) => {
     const state = req.query["state"] as string;
@@ -199,7 +200,7 @@ app.get("/login"
 // `passport.authenticate` will try to authenticate the content returned in
 // body (such as authorization code). If authentication fails, user will be
 // redirected to '/' (home page); otherwise, it passes to the next middleware.
-// traffic: from browser navigation
+// traffic source: browser navigation
 app.post('/auth/openid/return'
 ,bodyParser.urlencoded({ extended : true })
 ,(req, res, next) => {
@@ -221,7 +222,7 @@ app.post('/auth/openid/return'
 });
 
 // 'logout' route, logout from passport, and destroy the session with AAD.
-// traffic: from browser navigation
+// traffic source: browser navigation
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         req.logOut();
@@ -231,7 +232,7 @@ app.get('/logout', (req, res) => {
 });
 
 // /api route proxy support for UI app
-// traffic: from browser ajax call
+// traffic source: browser ajax call
 ///////////////////////////////////////////////////////////////////////////////
 const proxyRet = httpProxy.get({
     targetAcquisition: async (req) => ({targetUrl: `${API_BASE_URL}`})
@@ -258,30 +259,36 @@ function getAPISession(token_type: string, access_token: string) {
     return APISession.init(client);
 }
 
-// getting information about me
-// traffic: browser srcipt link
-app.get("/me"
-,(req, res, next) => {
-    if (!req.isAuthenticated()) {
-        res.jsonp(null);
-    } else {
-        next();
-    }
-}
+// getting initial information
+// traffic source: browser srcipt link
+app.get("/init-info"
 ,(req, res) => {
-    // get real user info here by calling the underlying api with the access token stored in the session store
-    const {token_type, access_token} = (req.session.passport.user as types.UserSessionStore);
-    getAPISession(token_type, access_token)
-    .me()
-    .then((user) => {
-        res.jsonp(user);
-    }).catch((err) => {
-        res.jsonp(null);
-    });
+    const ret = {
+        appInfo: {
+            name: packageJSON.name
+            ,version: packageJSON.version
+            ,description: packageJSON.description
+        }
+        ,user: null
+    }
+    if (!req.isAuthenticated()) {
+        res.jsonp(ret);
+    } else {
+        // get real user info here by calling the underlying api with the access token stored in the session store
+        const {token_type, access_token} = (req.session.passport.user as types.UserSessionStore);
+        getAPISession(token_type, access_token)
+        .me()
+        .then((user) => {
+            ret.user = user;
+            res.jsonp(ret);
+        }).catch((err) => {
+            res.jsonp(ret);
+        });
+    }
 });
 
 // for session debugging
-// traffic: from browser navigation
+// traffic source: browser navigation
 app.get("/debug-session", (req, res) => {
     res.json({
         authenticated: req.isAuthenticated()

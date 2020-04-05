@@ -1,7 +1,9 @@
 import * as React from 'react';
+import {AppInfo} from "../shared/types";
 import {Session} from "../shared/api-session";
 
 export interface Props {
+    appInfo: AppInfo;
     user: any;
     apiSession: Session;
     redirectPath: string;

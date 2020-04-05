@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Azure AD Web App Template</title>
+    <title>Web Application</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="media/favicon.png">
     <link rel="stylesheet" href="css/w3css/w3.css">
     <link rel="stylesheet" href="css/font-awesome/4.7.0/css/font-awesome.min.css">
     <script>
-        const setUser = (u) => {window.user = u;};
+        const setInitInfo = (info) => {
+            window.appInfo = info.appInfo;
+            window.user = info.user;
+            document.title = info.appInfo.description;
+        };
     </script>
-    <script src="me?callback=setUser"></script>
+    <script src="init-info?callback=setInitInfo"></script>
     <script src="js/redirect.js"></script>
 </head>
 <body>
