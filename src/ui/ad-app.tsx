@@ -7,10 +7,12 @@ import {client} from "./api-client";
 
 export interface Props {
     user: any;
+    redirectPath: string;
 }
 
 interface State {
     user?: any;
+    redirectPath?: string;
 }
 
 export class ADApp extends React.Component<Props, State> {
@@ -19,9 +21,10 @@ export class ADApp extends React.Component<Props, State> {
         this.state = {};
     }
     static getDerivedStateFromProps(props: Props, state: State) {
-        return {user: (props.user ? props.user : null)};
+        return {user: (props.user ? props.user : null), redirectPath: (props.redirectPath ? props.redirectPath : null)};
     }
     render() {
-        return (this.state.user ? <App apiSession={Session.init(client)} user={this.state.user}/> : <Login/>);
+        const authenticated = (this.state.user ? true : false);
+        return (authenticated ? <App apiSession={Session.init(client)} user={this.state.user} redirectPath={this.state.redirectPath}/> : <Login/>);
     }
 }
